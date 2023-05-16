@@ -5,7 +5,9 @@ import pygame
 #dimensions de la fenêtre et autre variable
 WIDTH = 800
 HEIGHT = 600
-game_over = True
+game_over = False
+#variable globale pour suivre l'état du "restart"
+restart_button = None
 
 
 
@@ -14,6 +16,15 @@ def game_over_screen():
     screen.clear()
     screen.draw.text("Game Over !!", center=(WIDTH/2, HEIGHT/2), fontsize=70, color="red")
 #autres éléments ajoutés à l'écran de fin de partie
+    global restart_button
+    restart_button = Actor("restart_button", conter=(WIDTH/2, HEIGHT/2 + 100))
+    restart_button.draw()
+
+def on_restart_click():
+    global game_over, restart_button
+    game_over = False
+    restart_button = None
+    ################### réinitialiser les éléments jeu
 
 
 
