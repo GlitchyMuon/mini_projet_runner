@@ -1,9 +1,9 @@
 # game data
 import pgzrun
+
 from argparse import Action
 from random import randint
 from tkinter import ANCHOR
-
 
 WIDTH = 800
 HEIGHT = 600
@@ -20,11 +20,13 @@ JUMP_SPEED = 200
 hero = Actor("hero", anchor=('middle', 'bottom'))
 hero.pos = (64, GROUND)
 hero_speed = 0
+lives = []
+life_points = 3
 
 # enemies initialisations
 
-BOX_APPARITION = (2, 5)
-next_box_time = randint(BOX_APPARITION[0], BOX_APPARITION[1])
+BOX_APPARTION = (2, 5)
+next_box_time = randint(BOX_APPARTION[0], BOX_APPARTION[1])
 boxes = []
 
 # background inititalisation
@@ -41,6 +43,12 @@ for n in range(NUMBER_OF_BACKGROUND):
     bg_t.pos = n * WIDTH, 0
     backgrounds_top.append(bg_t)
 
+for x in range(660, 795, 45):
+    for y in range(555, 600, 50):
+        heart = Actor('heart')
+        heart.pos = [x, y]
+        lives.append(heart)
+
 
 def draw():
     screen.clear()
@@ -54,6 +62,9 @@ def draw():
     for box in boxes:
         box.draw()
 
+    for heart in lives: #afficher coeurs dans draw 
+        heart.draw()
+
     hero.draw()
 
 
@@ -61,21 +72,25 @@ def update(dt):
 
     # enemies update
     # box
-    global next_box_time
+    global next_box_time, life_points, heart, lives
 
     next_box_time -= dt
     if next_box_time <= 0:
         box = Actor("box", anchor=('left', 'bottom'))
         box.pos = WIDTH, GROUND
         boxes.append(box)
-        next_box_time = randint(BOX_APPARITION[0], BOX_APPARITION[1])
+        next_box_time = randint(BOX_APPARTION[0], BOX_APPARTION[1])
 
     for box in boxes:
         x, y = box.pos
         x -= GAME_SPEED * dt
         box.pos = x, y
         if box.colliderect(hero):
-            exit()
+            life_points = life_points - 1
+            lives.remove(lives[-1])
+            boxes.remove(box)
+            if life_points == 0:
+                exit()
 
     if boxes:
         if boxes[0].pos[0] <= - 32:
@@ -123,9 +138,7 @@ def on_key_down(key):
 
     # jump
     if key == keys.SPACE:
-
-        if hero_speed <= 0:
+        if hero_speed <= 0 and hero.pos == (64, GROUND): 
             hero_speed = JUMP_SPEED
-        
 
 pgzrun.go()
