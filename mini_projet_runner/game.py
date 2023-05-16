@@ -3,7 +3,7 @@ import pgzrun
 from argparse import Action
 from random import randint
 from tkinter import ANCHOR
-
+#WORD PNG POUR VIES
 
 WIDTH = 800
 HEIGHT = 600
@@ -17,7 +17,7 @@ JUMP_SPEED = 200
 
 # hero initialisation
 
-hero = Actor("hero", anchor=('middle', 'bottom'))
+hero = Actor("clippy", anchor=('middle', 'bottom'))
 hero.pos = (64, GROUND)
 hero_speed = 0
 
@@ -33,11 +33,11 @@ backgrounds_bottom = []
 backgrounds_top = []
 
 for n in range(NUMBER_OF_BACKGROUND):
-    bg_b = Actor("bg_1", anchor=('left', 'top'))
+    bg_b = Actor("backg_1", anchor=('left', 'top'))
     bg_b.pos = n * WIDTH, 0
     backgrounds_bottom.append(bg_b)
 
-    bg_t = Actor("bg_2", anchor=('left', 'top'))
+    bg_t = Actor("backg_2", anchor=('left', 'top'))
     bg_t.pos = n * WIDTH, 0
     backgrounds_top.append(bg_t)
 
@@ -65,7 +65,7 @@ def update(dt):
 
     next_box_time -= dt
     if next_box_time <= 0:
-        box = Actor("box", anchor=('left', 'bottom'))
+        box = Actor("internet_explorer", anchor=('left', 'bottom'))
         box.pos = WIDTH, GROUND
         boxes.append(box)
         next_box_time = randint(BOX_APPARITION[0], BOX_APPARITION[1])
@@ -109,7 +109,7 @@ def update(dt):
 
     for bg in backgrounds_top:
         x, y = bg.pos
-        x -= GAME_SPEED/3 * dt
+        x -= GAME_SPEED * dt
         bg.pos = x, y
 
     if backgrounds_top[0].pos[0] <= - WIDTH:
@@ -120,11 +120,9 @@ def update(dt):
 
 def on_key_down(key):
     global hero_speed
-
     # jump
     if key == keys.SPACE:
-
-        if hero_speed <= 0:
+        if hero_speed <= 0 and hero.pos == (64, GROUND):
             hero_speed = JUMP_SPEED
         
 
