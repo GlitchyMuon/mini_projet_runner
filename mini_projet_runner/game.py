@@ -1,5 +1,6 @@
 # game data
 import pgzrun
+from pgzhelper import *
 from argparse import Action
 from random import randint
 from tkinter import ANCHOR
@@ -14,6 +15,10 @@ GRAVITY = 200
 NUMBER_OF_BACKGROUND = 2
 GAME_SPEED = 100
 JUMP_SPEED = 200
+
+screen_title_visible = True
+did_we_click = False
+
 
 # hero initialisation
 
@@ -32,6 +37,13 @@ boxes = []
 backgrounds_bottom = []
 backgrounds_top = []
 
+# start button initialisation
+
+scrtitle_button = Actor("start")
+scrtitle_button.scale = 0.30
+scrtitle_button.pos = [WIDTH/2, (HEIGHT/2)+200]
+
+
 for n in range(NUMBER_OF_BACKGROUND):
     bg_b = Actor("bg_1", anchor=('left', 'top'))
     bg_b.pos = n * WIDTH, 0
@@ -41,8 +53,20 @@ for n in range(NUMBER_OF_BACKGROUND):
     bg_t.pos = n * WIDTH, 0
     backgrounds_top.append(bg_t)
 
-
 def draw():
+    global screen_title_visible
+    if screen_title_visible == True:
+        draw_scrtitle()
+    
+    else:
+        draw_game()
+
+def draw_scrtitle():
+    screen.fill("dodgerblue")
+    scrtitle_button.draw()
+
+
+def draw_game():
     screen.clear()
 
     for bg in backgrounds_bottom:
@@ -56,12 +80,26 @@ def draw():
 
     hero.draw()
 
+    
 
+def update_screen_title() :
+    global screen_title_visible, did_we_click
+    pass
+    
 def update(dt):
+    global screen_title_visible, update_game, update_screen_title
+    
+    if screen_title_visible == True:
+        update_screen_title()
+    else:
+        update_game(dt)
+ 
+
+def update_game(dt):
+    global next_box_time
 
     # enemies update
     # box
-    global next_box_time
 
     next_box_time -= dt
     if next_box_time <= 0:
@@ -127,5 +165,10 @@ def on_key_down(key):
         if hero_speed <= 0:
             hero_speed = JUMP_SPEED
         
+def on_mouse_down(pos, button):
+    global screen_title_visible, did_we_click
+    if button == mouse.LEFT and not did_we_click and scrtitle_button.collidepoint_pixel(pos):
+        did_we_click = True
+        screen_title_visible = False
 
 pgzrun.go()
