@@ -37,11 +37,22 @@ boxes = []
 backgrounds_bottom = []
 backgrounds_top = []
 
+# start screen background initialisation
+scrtitle_bg = Actor("start_bg")
+scrtitle_bg.scale = 0.5
+scrtitle_bg.pos = [WIDTH/2, HEIGHT/2] 
+
 # start button initialisation
 
 scrtitle_button = Actor("start")
 scrtitle_button.scale = 0.30
 scrtitle_button.pos = [WIDTH/2, (HEIGHT/2)+200]
+
+# start game title initialisation
+
+scrtitle_gametitle = Actor("title")
+scrtitle_gametitle.scale = 0.30
+scrtitle_gametitle.pos = [WIDTH/2, HEIGHT/2] 
 
 
 for n in range(NUMBER_OF_BACKGROUND):
@@ -62,8 +73,9 @@ def draw():
         draw_game()
 
 def draw_scrtitle():
-    screen.fill("dodgerblue")
+    scrtitle_bg.draw()
     scrtitle_button.draw()
+    scrtitle_gametitle.draw()
 
 
 def draw_game():
@@ -162,7 +174,7 @@ def on_key_down(key):
     # jump
     if key == keys.SPACE:
 
-        if hero_speed <= 0:
+        if hero_speed <= 0 and hero.pos == (64, GROUND):
             hero_speed = JUMP_SPEED
         
 def on_mouse_down(pos, button):
