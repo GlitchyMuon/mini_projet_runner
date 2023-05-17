@@ -1,11 +1,8 @@
-    # game data
+# game data
 import pgzrun
 
 from pgzhelper import *
-from argparse import Action
 from random import randint
-from tkinter import ANCHOR
-#WORD PNG POUR VIES
 
 WIDTH = 800
 HEIGHT = 600
@@ -19,7 +16,6 @@ JUMP_SPEED = 200
 
 screen_title_visible = True
 did_we_click = False
-
 is_paused = False
 
 # hero initialisation
@@ -43,7 +39,7 @@ backgrounds_top = []
 
 # start screen background initialisation
 scrtitle_bg = Actor("start_bg")
-scrtitle_bg.scale = 0.5
+scrtitle_bg.scale = 0.50
 scrtitle_bg.pos = [WIDTH/2, HEIGHT/2] 
 
 # start button initialisation
@@ -64,7 +60,6 @@ pausescreen_bg.pos = [WIDTH/2, HEIGHT/2]
 pause_button = Actor("pause")
 pause_button.scale = 0.30
 pause_button.pos = [WIDTH/2, 70]
-
 
 for n in range(NUMBER_OF_BACKGROUND):
     bg_b = Actor("backg_3", anchor=('left', 'top'))
@@ -103,7 +98,6 @@ def draw_pause_screen():
     screen.draw.text("PRESS 'P' TO RESUME", fontsize = 90, center=[WIDTH / 2, 470], color=("Blue"))
 
 def draw_game():
-    screen.clear()
 
     for bg in backgrounds_bottom:
         bg.draw()
@@ -124,7 +118,7 @@ def update_screen_title() :
     pass
 
 def update(dt):
-    global screen_title_visible, update_game, update_screen_title, next_box_time
+    global screen_title_visible, update_game, update_screen_title
 
     if screen_title_visible == True:
         update_screen_title()
@@ -135,12 +129,10 @@ def update(dt):
         draw_pause_screen()
 
 def update_game(dt):
-    global next_box_time
+    global next_box_time, next_box_time, life_points, heart, lives, hero_speed
 
     # enemies update
     # box
-    global next_box_time, life_points, heart, lives
-
     next_box_time -= dt
     if next_box_time <= 0:
         box = Actor("internet_explorer", anchor=('left', 'bottom'))
@@ -169,9 +161,6 @@ def update_game(dt):
             boxes.pop(0)
 
     # hero update
-
-    global hero_speed
-
     hero_speed -= GRAVITY * dt
     x, y = hero.pos
     y -= hero_speed * dt
@@ -183,7 +172,6 @@ def update_game(dt):
     hero.pos = x, y
 
     # bg update
-
     if backgrounds_bottom[0].pos[0] <= - WIDTH:
         bg = backgrounds_bottom.pop(0)
         bg.pos = (NUMBER_OF_BACKGROUND - 1) * WIDTH, 0
@@ -199,19 +187,19 @@ def update_game(dt):
             x, y = bg.pos
             bg.pos = x, y
 
-
     if backgrounds_top[0].pos[0] <= - WIDTH:
         bg = backgrounds_top.pop(0)
         bg.pos = (NUMBER_OF_BACKGROUND - 1) * WIDTH, 0
         backgrounds_top.append(bg)
 
-
 def on_key_down(key):
     global hero_speed, is_paused
+
     # jump
     if key == keys.SPACE:
         if hero_speed <= 0 and hero.pos == (64, GROUND):
             hero_speed = JUMP_SPEED
+            
     # pause
     if key == keys.P:
         if is_paused == False:
@@ -221,6 +209,7 @@ def on_key_down(key):
         
 def on_mouse_down(pos, button):
     global screen_title_visible, did_we_click
+
     if button == mouse.LEFT and not did_we_click and scrtitle_button.collidepoint_pixel(pos):
         did_we_click = True
         screen_title_visible = False
