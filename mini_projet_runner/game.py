@@ -1,4 +1,4 @@
-# game data
+    # game data
 import pgzrun
 
 from argparse import Action
