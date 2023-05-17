@@ -1,10 +1,13 @@
     # game data
 import pgzrun
+ 
 
 from pgzhelper import *
 from argparse import Action
 from random import randint
 from tkinter import ANCHOR
+
+
 #WORD PNG POUR VIES
 
 WIDTH = 800
@@ -57,13 +60,22 @@ scrtitle_gametitle = Actor("title")
 scrtitle_gametitle.scale = 0.30
 scrtitle_gametitle.pos = [WIDTH/2, HEIGHT/2] 
 
+# game over
+game_over_button = Actor("game_over")
+game_over_button.scale = 0.2
+game_over_button.pos = [WIDTH/2, HEIGHT/2 - 100]
+restart_button = Actor("restart")
+restart_button.scale = 0.2
+restart_button.pos = [WIDTH/2, HEIGHT/2 + 100]
+game_over_bg = Actor("game_over_bg")
+game_over_bg.pos = [WIDTH/2, HEIGHT/2]
 
 for n in range(NUMBER_OF_BACKGROUND):
-    bg_b = Actor("backg_1", anchor=('left', 'top'))
+    bg_b = Actor("backg_3", anchor=('left', 'top'))
     bg_b.pos = n * WIDTH, 0
     backgrounds_bottom.append(bg_b)
 
-    bg_t = Actor("backg_2", anchor=('left', 'top'))
+    bg_t = Actor("backg_4", anchor=('left', 'top'))
     bg_t.pos = n * WIDTH, 0
     backgrounds_top.append(bg_t)
 
@@ -75,18 +87,26 @@ for x in range(660, 795, 45):
 
 
 def draw():
-    global screen_title_visible
+    global screen_title_visible, is_paused
     if screen_title_visible == True:
         draw_scrtitle()
     
     else:
         draw_game()
 
+    if life_points == 0:
+        game_over_screen()
+
 def draw_scrtitle():
     scrtitle_bg.draw()
     scrtitle_button.draw()
     scrtitle_gametitle.draw()
 
+def game_over_screen():
+    screen.clear()
+    game_over_bg.draw()
+    game_over_button.draw()
+    restart_button.draw()
 
 def draw_game():
     screen.clear()
@@ -142,8 +162,6 @@ def update_game(dt):
             life_points = life_points - 1
             lives.remove(lives[-1])
             boxes.remove(box)
-            if life_points == 0:
-                exit()
 
     if boxes:
         if boxes[0].pos[0] <= - 32:
@@ -194,8 +212,8 @@ def on_key_down(key):
             hero_speed = JUMP_SPEED
         
 def on_mouse_down(pos, button):
-    global screen_title_visible, did_we_click
-    if button == mouse.LEFT and not did_we_click and scrtitle_button.collidepoint_pixel(pos):
+    global screen_title_visible, did_we_click, restart_button
+    if button == mouse.LEFT and not did_we_click and scrtitle_button.collidepoint_pixel(pos) or restart_button.collidepoint_pixel(pos):
         did_we_click = True
         screen_title_visible = False
 
