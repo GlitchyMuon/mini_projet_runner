@@ -20,7 +20,9 @@ GRAVITY = 200
 
 NUMBER_OF_BACKGROUND = 2
 GAME_SPEED = 100
-JUMP_SPEED = 200
+JUMP_SPEED = 220
+
+ENNEMY_SPEED = 50
 
 screen_title_visible = True
 did_we_click = False
@@ -36,9 +38,11 @@ life_points = 3
 
 # enemies initialisations
 
-BOX_APPARTION = (2, 5)
-next_box_time = randint(BOX_APPARTION[0], BOX_APPARTION[1])
+BOX_APPARITION = (2, 5)
+next_box_time = randint(BOX_APPARITION[0], BOX_APPARITION[1])
 boxes = []
+box_speed = [0,1]
+
 
 # background inititalisation
 
@@ -140,8 +144,12 @@ def draw_game():
 
 def update_screen_title() :
     global screen_title_visible, did_we_click
-    pass
-
+    
+    if not music.is_playing('windows_error'):
+        music.play_once('windows_error')
+        music.set_volume(0.5)
+        music.get_volume()
+    
 def update(dt):
     global screen_title_visible, update_game, update_screen_title
 
@@ -160,30 +168,40 @@ def update_game(dt):
     # box
     next_box_time -= dt
     if next_box_time <= 0:
-        box = Actor("internet_explorer", anchor=('left', 'bottom'))
+        box = Actor("internet_explorer", anchor=('center', 'bottom'))
         box.pos = WIDTH, GROUND
         boxes.append(box)
-        next_box_time = randint(BOX_APPARTION[0], BOX_APPARTION[1])
-    
-    if is_paused == False:
-        for box in boxes:
-            x, y = box.pos
-            x -= GAME_SPEED * dt
-            box.pos = x, y
-            if box.colliderect(hero):
-                life_points = life_points - 1
-                lives.remove(lives[-1])
-                boxes.remove(box)
-                if life_points == 0:
-                    exit()
-    else:
-        for box in boxes:
-            x, y = box.pos
-            box.pos = x, y
+        next_box_time = randint(BOX_APPARITION[0], BOX_APPARITION[1])
+
+    for box in boxes:
+        x, y = box.pos
+        x -= GAME_SPEED * dt
+        box.pos = x, y
+
+        global box_speed
+
+        new_x = box.pos[0] + box_speed[0] 
+        new_y = box.pos[1] + box_speed[1] 
+
+        box.pos = [new_x, new_y] 
+
+        if box.top >= 393 :
+            invert_vertical_speed()
+
+        if box.bottom <= GROUND :
+            invert_vertical_speed()
+
+        if box.colliderect(hero):
+            life_points = life_points - 1
+            lives.remove(lives[-1])
+            boxes.remove(box)
+            if life_points == 0:
+                exit()
 
     if boxes:
         if boxes[0].pos[0] <= - 32:
             boxes.pop(0)
+            
 
     # hero update
     hero_speed -= GRAVITY * dt
@@ -195,6 +213,8 @@ def update_game(dt):
         hero_speed = 0
 
     hero.pos = x, y
+
+
 
     # bg update
     if backgrounds_bottom[0].pos[0] <= - WIDTH:
@@ -237,5 +257,11 @@ def on_mouse_down(pos, button):
     if button == mouse.LEFT and not did_we_click and scrtitle_button.collidepoint_pixel(pos) or restart_button.collidepoint_pixel(pos):
         did_we_click = True
         screen_title_visible = False
+
+
+def invert_vertical_speed():
+    box_speed[1] = box_speed[1] * -1
+
+
 
 pgzrun.go()
