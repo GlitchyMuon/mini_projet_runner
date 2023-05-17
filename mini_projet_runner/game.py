@@ -20,6 +20,7 @@ JUMP_SPEED = 200
 screen_title_visible = True
 did_we_click = False
 
+is_paused = False
 
 # hero initialisation
 
@@ -57,6 +58,13 @@ scrtitle_gametitle = Actor("title")
 scrtitle_gametitle.scale = 0.30
 scrtitle_gametitle.pos = [WIDTH/2, HEIGHT/2] 
 
+# pause screen background init
+pausescreen_bg = Actor("pause_screen")
+pausescreen_bg.pos = [WIDTH/2, HEIGHT/2]
+pause_button = Actor("pause")
+pause_button.scale = 0.30
+pause_button.pos = [WIDTH/2, 70]
+
 
 for n in range(NUMBER_OF_BACKGROUND):
     bg_b = Actor("backg_3", anchor=('left', 'top'))
@@ -73,20 +81,26 @@ for x in range(660, 795, 45):
         heart.pos = [x, y]
         lives.append(heart)
 
-
 def draw():
     global screen_title_visible
+
     if screen_title_visible == True:
         draw_scrtitle()
-    
     else:
         draw_game()
+
+    if is_paused == True:
+        draw_pause_screen()
 
 def draw_scrtitle():
     scrtitle_bg.draw()
     scrtitle_button.draw()
     scrtitle_gametitle.draw()
 
+def draw_pause_screen():
+    pausescreen_bg.draw()
+    pause_button.draw()
+    screen.draw.text("PRESS 'P' TO RESUME", fontsize = 90, center=[WIDTH / 2, 470], color=("Blue"))
 
 def draw_game():
     screen.clear()
@@ -105,20 +119,20 @@ def draw_game():
 
     hero.draw()
 
-    
-
 def update_screen_title() :
     global screen_title_visible, did_we_click
     pass
-    
+
 def update(dt):
-    global screen_title_visible, update_game, update_screen_title
-    
+    global screen_title_visible, update_game, update_screen_title, next_box_time
+
     if screen_title_visible == True:
         update_screen_title()
     else:
         update_game(dt)
- 
+
+    if is_paused == True:
+        draw_pause_screen()
 
 def update_game(dt):
     global next_box_time
@@ -133,17 +147,22 @@ def update_game(dt):
         box.pos = WIDTH, GROUND
         boxes.append(box)
         next_box_time = randint(BOX_APPARTION[0], BOX_APPARTION[1])
-
-    for box in boxes:
-        x, y = box.pos
-        x -= GAME_SPEED * dt
-        box.pos = x, y
-        if box.colliderect(hero):
-            life_points = life_points - 1
-            lives.remove(lives[-1])
-            boxes.remove(box)
-            if life_points == 0:
-                exit()
+    
+    if is_paused == False:
+        for box in boxes:
+            x, y = box.pos
+            x -= GAME_SPEED * dt
+            box.pos = x, y
+            if box.colliderect(hero):
+                life_points = life_points - 1
+                lives.remove(lives[-1])
+                boxes.remove(box)
+                if life_points == 0:
+                    exit()
+    else:
+        for box in boxes:
+            x, y = box.pos
+            box.pos = x, y
 
     if boxes:
         if boxes[0].pos[0] <= - 32:
@@ -165,20 +184,21 @@ def update_game(dt):
 
     # bg update
 
-    # for bg in backgrounds_bottom:
-    #     x, y = bg.pos
-    #     x -= GAME_SPEED * dt
-    #     bg.pos = x, y
-
     if backgrounds_bottom[0].pos[0] <= - WIDTH:
         bg = backgrounds_bottom.pop(0)
         bg.pos = (NUMBER_OF_BACKGROUND - 1) * WIDTH, 0
         backgrounds_bottom.append(bg)
 
-    for bg in backgrounds_top:
-        x, y = bg.pos
-        x -= GAME_SPEED * dt
-        bg.pos = x, y
+    if is_paused == False:
+        for bg in backgrounds_top:
+            x, y = bg.pos
+            x -= GAME_SPEED * dt
+            bg.pos = x, y
+    else:
+        for bg in backgrounds_top:
+            x, y = bg.pos
+            bg.pos = x, y
+
 
     if backgrounds_top[0].pos[0] <= - WIDTH:
         bg = backgrounds_top.pop(0)
@@ -187,11 +207,17 @@ def update_game(dt):
 
 
 def on_key_down(key):
-    global hero_speed
+    global hero_speed, is_paused
     # jump
     if key == keys.SPACE:
         if hero_speed <= 0 and hero.pos == (64, GROUND):
             hero_speed = JUMP_SPEED
+    # pause
+    if key == keys.P:
+        if is_paused == False:
+            is_paused = True
+        elif is_paused == True:
+            is_paused = False
         
 def on_mouse_down(pos, button):
     global screen_title_visible, did_we_click
