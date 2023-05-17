@@ -1,6 +1,7 @@
     # game data
 import pgzrun
 
+from pgzhelper import *
 from argparse import Action
 from random import randint
 from tkinter import ANCHOR
@@ -15,6 +16,10 @@ GRAVITY = 200
 NUMBER_OF_BACKGROUND = 2
 GAME_SPEED = 100
 JUMP_SPEED = 200
+
+screen_title_visible = True
+did_we_click = False
+
 
 # hero initialisation
 
@@ -35,6 +40,24 @@ boxes = []
 backgrounds_bottom = []
 backgrounds_top = []
 
+# start screen background initialisation
+scrtitle_bg = Actor("start_bg")
+scrtitle_bg.scale = 0.5
+scrtitle_bg.pos = [WIDTH/2, HEIGHT/2] 
+
+# start button initialisation
+
+scrtitle_button = Actor("start")
+scrtitle_button.scale = 0.30
+scrtitle_button.pos = [WIDTH/2, (HEIGHT/2)+200]
+
+# start game title initialisation
+
+scrtitle_gametitle = Actor("title")
+scrtitle_gametitle.scale = 0.30
+scrtitle_gametitle.pos = [WIDTH/2, HEIGHT/2] 
+
+
 for n in range(NUMBER_OF_BACKGROUND):
     bg_b = Actor("backg_1", anchor=('left', 'top'))
     bg_b.pos = n * WIDTH, 0
@@ -52,6 +75,20 @@ for x in range(660, 795, 45):
 
 
 def draw():
+    global screen_title_visible
+    if screen_title_visible == True:
+        draw_scrtitle()
+    
+    else:
+        draw_game()
+
+def draw_scrtitle():
+    scrtitle_bg.draw()
+    scrtitle_button.draw()
+    scrtitle_gametitle.draw()
+
+
+def draw_game():
     screen.clear()
 
     for bg in backgrounds_bottom:
@@ -68,8 +105,23 @@ def draw():
 
     hero.draw()
 
+    
 
+def update_screen_title() :
+    global screen_title_visible, did_we_click
+    pass
+    
 def update(dt):
+    global screen_title_visible, update_game, update_screen_title
+    
+    if screen_title_visible == True:
+        update_screen_title()
+    else:
+        update_game(dt)
+ 
+
+def update_game(dt):
+    global next_box_time
 
     # enemies update
     # box
@@ -140,5 +192,11 @@ def on_key_down(key):
     if key == keys.SPACE:
         if hero_speed <= 0 and hero.pos == (64, GROUND):
             hero_speed = JUMP_SPEED
+        
+def on_mouse_down(pos, button):
+    global screen_title_visible, did_we_click
+    if button == mouse.LEFT and not did_we_click and scrtitle_button.collidepoint_pixel(pos):
+        did_we_click = True
+        screen_title_visible = False
 
 pgzrun.go()
