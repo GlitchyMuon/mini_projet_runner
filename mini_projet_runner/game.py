@@ -59,11 +59,11 @@ scrtitle_gametitle.pos = [WIDTH/2, HEIGHT/2]
 
 
 for n in range(NUMBER_OF_BACKGROUND):
-    bg_b = Actor("backg_1", anchor=('left', 'top'))
+    bg_b = Actor("backg_3", anchor=('left', 'top'))
     bg_b.pos = n * WIDTH, 0
     backgrounds_bottom.append(bg_b)
 
-    bg_t = Actor("backg_2", anchor=('left', 'top'))
+    bg_t = Actor("backg_4", anchor=('left', 'top'))
     bg_t.pos = n * WIDTH, 0
     backgrounds_top.append(bg_t)
 
@@ -165,10 +165,10 @@ def update_game(dt):
 
     # bg update
 
-    for bg in backgrounds_bottom:
-        x, y = bg.pos
-        x -= GAME_SPEED * dt
-        bg.pos = x, y
+    # for bg in backgrounds_bottom:
+    #     x, y = bg.pos
+    #     x -= GAME_SPEED * dt
+    #     bg.pos = x, y
 
     if backgrounds_bottom[0].pos[0] <= - WIDTH:
         bg = backgrounds_bottom.pop(0)
